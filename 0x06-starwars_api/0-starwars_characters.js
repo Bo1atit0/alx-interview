@@ -1,48 +1,30 @@
+// Write a script that prints all characters of a Star Wars movie:
+// The first positional argument passed is the Movie ID - example: 3 = “Return of the Jedi”
+// Display one character name per line in the same order as the “characters” list in the /films/ endpoint
+// You must use the Star wars API
+// You must use the request module
+
 const request = require('request');
 
-// Get the movie ID from the command-line arguments
 const movieId = process.argv[2];
+const movieUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
 
-// URL for fetching the movie details from the Star Wars API
-const movieUrl = `https://swapi.dev/api/films/${movieId}/`;
-
-// Fetch movie data
 request(movieUrl, (error, response, body) => {
   if (error) {
-    console.error('Error fetching movie data:', error);
-    return;
+    console.error('Error:', error);
   }
 
-  if (response.statusCode !== 200) {
-    console.log('Failed to fetch movie data:', response.statusCode);
-    return;
-  }
+  const movieBody = JSON.parse(body);
+  // console.log(movieBody)
 
-  // Parse the movie data
-  const movieData = JSON.parse(body);
-
-  // Check if characters exist in the movie data
-  if (!movieData.characters || movieData.characters.length === 0) {
-    console.log('No characters found for this movie.');
-    return;
-  }
-
-  // Print all character names from the characters list
-  movieData.characters.forEach(characterUrl => {
-    request(characterUrl, (err, res, charBody) => {
-      if (err) {
-        console.error('Error fetching character data:', err);
-        return;
+  const characters = movieBody.characters;
+  characters.forEach(charactersUrl => {
+    request(charactersUrl, (error, response, body) => {
+      if (error) {
+        console.log('Error:', error);
       }
-
-      if (res.statusCode !== 200) {
-        console.log('Failed to fetch character data:', res.statusCode);
-        return;
-      }
-
-      // Parse and print the character's name
-      const characterData = JSON.parse(charBody);
-      console.log(characterData.name);
+      const name = JSON.parse(body).name;
+      console.log(name);
     });
   });
 });
