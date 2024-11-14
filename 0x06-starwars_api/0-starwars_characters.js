@@ -6,29 +6,34 @@
 // You must use the Star wars API
 // You must use the request module
 
-//
+// moviebody -> charactersArray -> charactersUrl -> charactersName
 
 const request = require('request');
 
 const movieId = process.argv[2];
 const movieUrl = `https://swapi-api.alx-tools.com/api/films/${movieId}`;
 
-request(movieUrl, (error, response, body) => {
-  if (error) {
-    console.error('Error:', error);
-  }
-
-  const movieBody = JSON.parse(body);
-  // console.log(movieBody)
-
-  const characters = movieBody.characters;
-  characters.forEach(charactersUrl => {
-    request(charactersUrl, (error, response, body) => {
+function makeRequest (url) {
+  return new Promise((resolve, reject) => {
+    request(url, (error, response, body) => {
       if (error) {
-        console.log('Error:', error);
+        reject(error);
+      } else if (response.statusCode !== 200) {
+        reject(new Error(`Failed to Fetch Data:', ${response.statusCode}`));
+      } else {
+        resolve(JSON.parse(body));
       }
-      const charName = JSON.parse(body).name;
-      console.log(charName);
     });
   });
-});
+}
+makeRequest(movieUrl)
+  .then(movieBody => {
+    const charactersObject = movieBody.characters.map(charactersUrl => makeRequest(charactersUrl));
+    return Promise.all(charactersObject);
+  }
+  )
+  .then(characterName => {
+    characterName.forEach(characters => {
+      console.log(characters.name);
+    });
+  });
