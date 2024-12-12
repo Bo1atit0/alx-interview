@@ -3,6 +3,7 @@
 Determine the winner of the prime game.
 """
 
+
 def isWinner(x, nums):
     """
     Determines the winner of the prime game.
@@ -41,7 +42,7 @@ def isWinner(x, nums):
     for n in nums:
         # Count the primes in the range [1, n]
         prime_count = prime_counts[n]
-        
+
         # Maria wins if the prime count is odd, Ben wins if even
         if prime_count % 2 == 1:
             maria_wins += 1
